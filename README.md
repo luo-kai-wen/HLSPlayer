@@ -5,10 +5,13 @@
 1.播放器支持COVER
 
 
-效果：
-
-
 ![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot05.png?raw=true)
+
+
+2.VTT缩略图
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot06.png?raw=true)
 
 
 2.播放器缩放时，UI做了自适应
