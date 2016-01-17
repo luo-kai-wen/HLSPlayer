@@ -14,7 +14,13 @@
 ![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot06.png?raw=true)
 
 
-2.播放器缩放时，UI做了自适应
+3.SRT字幕显示（UTF-8格式）
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot07.png?raw=true)
+
+
+4.播放器缩放时，UI做了自适应
 
 
 ![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot01.png?raw=true)
@@ -29,10 +35,10 @@
 ![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot04.png?raw=true)
 
 
-未完成功能：
+待完成功能：
 
 
-字幕切换/清晰度切换
+字幕切换，清晰度切换，字幕显示细节优化
 
 
 感谢：
