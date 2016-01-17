@@ -11,11 +11,25 @@
 ![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot05.png?raw=true)
 
 
+2.播放器缩放时，UI做了自适应
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot01.png?raw=true)
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot02.png?raw=true)
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot03.png?raw=true)
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot04.png?raw=true)
+
 
 未完成功能：
 
 
-全屏/字幕切换显示/清晰度切换UI
+字幕切换/清晰度切换
 
 
 感谢：
