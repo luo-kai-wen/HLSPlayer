@@ -2,6 +2,16 @@
 基于Flash插件的HLS播放器，支持VTT缩略图，SRT字幕，片头广告，暂停广告等
 
 
+1.播放器支持COVER
+
+
+效果：
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot05.png?raw=true)
+
+
+
 未完成功能：
 
 
