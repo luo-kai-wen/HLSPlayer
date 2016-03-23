@@ -273,7 +273,7 @@ package com.fenhongxiang
 			
 			if (_adLb)
 			{
-				_adLb.htmlText = "<font size='14'>广告剩余<font color='#FF0000' size='18'>" + leftCount +"</font>秒</font>";
+				_adLb.htmlText = "<font size='14' color='#FFFFFF'>广告剩余 <font color='#FF0000' size='16'>" + leftCount +"</font> 秒</font>";
 			}
 			
 			if (onPlaying != null)
@@ -297,7 +297,7 @@ package com.fenhongxiang
 			
 			//显示广告时间的文本框
 			_adLb = new TextField();
-			_adLb.width = 103;
+			_adLb.width = 110;
 			_adLb.x = this.width - _adLb.width - 30;
 			_adLb.y = 10;
 			_adLb.mouseEnabled = false;
