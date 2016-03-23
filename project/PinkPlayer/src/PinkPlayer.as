@@ -133,7 +133,7 @@ package
 			adPlayer.onError 	= onADEnd;
 			adPlayer.jumpURL 	= prerollClickURL;
 			adPlayer.resize(this.stage.stageWidth, this.stage.stageHeight);
-			adPlayer.play(prerollURL, 3);
+			adPlayer.play(prerollURL, 0);
 
 			this.addChild(adPlayer);
 		}
