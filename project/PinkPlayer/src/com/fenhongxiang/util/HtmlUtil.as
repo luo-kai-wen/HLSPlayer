@@ -8,6 +8,7 @@ package com.fenhongxiang.util
 	{
 		public function HtmlUtil()
 		{
+			
 		}
 		
 		public static function browser():String 

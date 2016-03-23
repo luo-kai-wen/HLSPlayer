@@ -1,17 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Copyright © 2015 FenHongXiang                                              */
-/* 深圳粉红象科技有限公司                                                                										  */
-/* www.fenhongxiang.com                                                       */
-/* All rights reserved.                                                       */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
+
 package com.fenhongxiang.srt
 {
 	import flash.geom.Rectangle;
-	public class SRTData
+	public class SRTModel
 	{
-		static public  const TIME_PATTERN:RegExp = new RegExp('[0-9][0-9]:[0-9][0-9].[0-9][0-9],[0-9][0-9][0-9] --> [0-9][0-9]:[0-9][0-9].[0-9][0-9],[0-9][0-9][0-9]', 'i');
+		public static   const TIME_PATTERN:RegExp = new RegExp('[0-9][0-9]:[0-9][0-9].[0-9][0-9],[0-9][0-9][0-9] --> [0-9][0-9]:[0-9][0-9].[0-9][0-9],[0-9][0-9][0-9]', 'i');
 		
 		/**
 		 * 
@@ -19,7 +19,7 @@ package com.fenhongxiang.srt
 		 * @param data 字幕文本内容
 		 * 
 		 * */
-		public function SRTData(time:String=null, data:String=null)
+		public function SRTModel(time:String=null, data:String=null)
 		{
 			_time = time;
 			_data = data;

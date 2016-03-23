@@ -1,6 +1,11 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
+
 package com.fenhongxiang.vtt
 {
 	import flash.events.Event;
@@ -12,69 +17,59 @@ package com.fenhongxiang.vtt
 
 	public class VTTLoader extends EventDispatcher
 	{
-		private var _loader:URLLoader;
-		
+
 		public function VTTLoader()
 		{
 		}
+
+		private var _loader:URLLoader;
+		public static var imageURL:String;
 		
-		public function load(url:String):void 
+		public function load(url:String):void
 		{
-			if (_loader == null)
+			imageURL = url;
+			
+			if (imageURL)
 			{
-				_loader = new URLLoader();
-			}
-			else
-			{
-				try
-				{
-					_loader.close();
-				}
-				catch(e:*)
-				{
-					
-				}
+				imageURL = imageURL.substr(0, imageURL.lastIndexOf("/"));
 			}
 			
-			_loader.addEventListener(Event.COMPLETE, loadedHandler, false, 0, true);
-			_loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler, false, 0, true);
-			_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler, false, 0, true);
-			
+			_loader = getLoaderInstance();
+
 			try
 			{
 				_loader.load(new URLRequest(url));
 			}
-			catch(e:*)
+			catch (e:*)
 			{
 				errorHandler();
 			}
 		}
-		
 		//----------------------------event handlers-------------------------------------------------//
-		private function loadedHandler(e:Event):void 
+		
+		private function errorHandler(e:* = null):void
+		{
+			removeListeners();
+			dispatchEvent(new VTTLoaderEvent(VTTLoaderEvent.ERROR, null, true));
+		}
+		
+		private function loadedHandler(e:Event):void
 		{
 			var vttStr:String = e.target.data;
 			var vttData:Vector.<VTTModel> = parseVTT(vttStr);
-			
+
 			if (vttData)
 			{
-				removeListeners();				
-				dispatchEvent(new VTTEvent(VTTEvent.LOADED, vttData, true));
+				removeListeners();
+				dispatchEvent(new VTTLoaderEvent(VTTLoaderEvent.LOADED, vttData, true));
 			}
 			else
 			{
 				errorHandler();
 			}
 		}
-		
-		private function errorHandler(e:*=null):void 
-		{
-			removeListeners();		
-			dispatchEvent(new VTTEvent(VTTEvent.ERROR, null, true));
-		}
-		
+
 		//----------------------------tool function-------------------------------------------------//
-		
 		private function removeListeners():void
 		{
 			if (_loader != null)
@@ -85,7 +80,31 @@ package com.fenhongxiang.vtt
 			}
 		}
 		
-		private function  parseVTT(src:String):Vector.<VTTModel>
+		private function getLoaderInstance():URLLoader
+		{
+			if (_loader == null)
+			{
+				_loader = new URLLoader();
+				_loader.addEventListener(Event.COMPLETE, loadedHandler, false, 0, true);
+				_loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler, false, 0, true);
+				_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler, false, 0, true);
+			}
+			else
+			{
+				try
+				{
+					_loader.close();
+				}
+				catch (e:*)
+				{
+					
+				}
+			}
+			
+			return _loader;
+		}
+		
+		private function parseVTT(src:String):Vector.<VTTModel>
 		{
 			if (src && src != "")
 			{
@@ -94,12 +113,12 @@ package com.fenhongxiang.vtt
 				if (vttArr != null && vttArr.length > 0)
 				{
 					var vttDataArr:Vector.<VTTModel> = new Vector.<VTTModel>();
-
+					
 					var len:int = vttArr.length;
 					
-					for (var i:int = 0; i < len; i += 2) 
+					for (var i:int = 0; i < len; i += 2)
 					{
-						vttDataArr.push(new VTTModel(vttArr[i], vttArr[i+1]));
+						vttDataArr.push(new VTTModel(vttArr[i], vttArr[i + 1]));
 					}
 					
 					return vttDataArr;
@@ -112,12 +131,10 @@ package com.fenhongxiang.vtt
 				return null;
 			}
 		}
-		
+
 		private function vttFilter(item:*, index:int, array:Array):Boolean
 		{
 			return item != "WEBVTT" && item != "";
 		}
-		
-
 	}
 }

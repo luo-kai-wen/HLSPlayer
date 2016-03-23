@@ -1,5 +1,7 @@
 package com.fenhongxiang.util
 {
+	import flash.display.Stage;
+
 	public final class ObjectUtil
 	{
 		public function ObjectUtil()
@@ -20,6 +22,34 @@ package com.fenhongxiang.util
 			}
 			
 			return true;
+		}
+		
+		public static function parseBoolean(value:*):Boolean
+		{
+			var result:Boolean=false;
+			
+			if (value is String)
+			{
+				result=(value == "true") ? true : false;
+			}
+			else
+			{
+				result=Boolean(value);
+			}
+			
+			return result;
+		}
+		
+		public static function getSWFParameter(name:String, stage:Stage):String
+		{
+			var paramValue:* = "";
+			
+			if (stage && name)
+			{
+				paramValue = stage.loaderInfo.parameters[name];
+			}
+			
+			return paramValue;
 		}
 	}
 }

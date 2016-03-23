@@ -1,11 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Copyright © 2015 FenHongXiang                                              */
-/* 深圳粉红象科技有限公司                                                                										  */
-/* www.fenhongxiang.com                                                       */
-/* All rights reserved.                                                       */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
+
 package com.fenhongxiang.view
 {
 	import flash.display.Loader;
@@ -13,6 +13,7 @@ package com.fenhongxiang.view
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
+	
 	public class CoverLoader extends Sprite
 	{
 
@@ -27,16 +28,21 @@ package com.fenhongxiang.view
 
 		public function load(path:String):void
 		{
-			ldr=new Loader();
-			ldr.contentLoaderInfo.addEventListener(Event.COMPLETE, onCoverLoadedHandler, false, 0, true);
-			ldr.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onCoverLoadErrorHandler, false, 0, true);
+			if (ldr == null)
+			{
+				ldr = new Loader();
+				ldr.contentLoaderInfo.addEventListener(Event.COMPLETE, onCoverLoadedHandler, false, 0, true);
+				ldr.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onCoverLoadErrorHandler, false, 0, true);
+			}
+
 			ldr.load(new URLRequest(path));
 		}
 
 		private function drawBackground(w:Number, h:Number):void
 		{
-			_w=w;
-			_h=h;
+			_w = w;
+			_h = h;
+			
 			this.graphics.clear();
 			this.graphics.beginFill(0x1F272A, 1);
 			this.graphics.drawRect(0, 0, w, h);
@@ -50,8 +56,9 @@ package com.fenhongxiang.view
 
 		private function onCoverLoadedHandler(e:Event):void
 		{
-			ldr.width=_w;
-			ldr.height=_h;
+			ldr.width = _w;
+			ldr.height = _h;
+			
 			if (!this.contains(ldr))
 			{
 				this.addChild(ldr);

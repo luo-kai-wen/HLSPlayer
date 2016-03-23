@@ -1,6 +1,11 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
+
 package com.fenhongxiang.vtt
 {
 	import flash.display.Bitmap;
@@ -15,51 +20,43 @@ package com.fenhongxiang.vtt
 	
 	internal class ImageLoader extends EventDispatcher
 	{
-		public function ImageLoader(target:IEventDispatcher=null)
+		public function ImageLoader(target:IEventDispatcher = null)
 		{
 			super(target);
 		}
-		
-		private  var _loader:Loader;
-		public  function load(url:String):void 
+
+		private var _loader:Loader;
+
+		public function load(url:String):void
 		{
-		   if (_loader == null)
-		   {
-			   _loader = new Loader();
-			   _loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadedHandler, false, 0, true);
-			   _loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler, false, 0, true);
-			   _loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoadErrorHandler, false, 0, true);
-		   }
-		   
-		   try
-		   {
-			   _loader.close();
-		   }
-		   catch(e:*)
-		   {
-			   //
-		   }
-		   
-		   try
-		   {
-			   _loader.load(new URLRequest(url));
-		   }
-		   catch(e:*)
-		   {
-			   onLoadErrorHandler();
-		   }
+			_loader = getLoaderInstance();
+			
+			try
+			{
+				_loader.load(new URLRequest(url));
+			}
+			catch (e:*)
+			{
+				onLoadErrorHandler();
+			}
 		}
-		
-		private  function onLoadedHandler(e:Event):void
+
+		private function onLoadErrorHandler(e:* = null):void
+		{
+			dispatchEvent(new ImageLoaderEvent(ImageLoaderEvent.ERROR, null, true));
+			removeListeners();
+		}
+
+		private function onLoadedHandler(e:Event):void
 		{
 			var bitMap:Bitmap = e.target.content as Bitmap;
-			
-			if (bitMap)
+
+			if (bitMap != null)
 			{
-				var imgData:BitmapData = bitMap.bitmapData.clone();;
-					bitMap.bitmapData.dispose();
-					
-				dispatchEvent(new ImageEvent(ImageEvent.LOADED, imgData, true));
+				var imgData:BitmapData = bitMap.bitmapData.clone();
+				bitMap.bitmapData.dispose();
+
+				dispatchEvent(new ImageLoaderEvent(ImageLoaderEvent.LOADED, imgData, true));
 				removeListeners();
 			}
 			else
@@ -69,15 +66,31 @@ package com.fenhongxiang.vtt
 			}
 		}
 		
-		private  function onLoadErrorHandler(e:*=null):void
+		private function getLoaderInstance():Loader
 		{
-			dispatchEvent(new ImageEvent(ImageEvent.ERROR, null, true));
-			removeListeners();
+			if (_loader == null)
+			{
+				_loader = new Loader();
+				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadedHandler, false, 0, true);
+				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler, false, 0, true);
+				_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoadErrorHandler, false, 0, true);
+			}
+			
+			try
+			{
+				_loader.close();
+			}
+			catch (e:*)
+			{
+				//
+			}
+			
+			return _loader;
 		}
-		
+
 		private function removeListeners():void
 		{
-			if (_loader)
+			if (_loader != null)
 			{
 				_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadedHandler);
 				_loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);

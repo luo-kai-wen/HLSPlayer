@@ -5,14 +5,14 @@ package com.fenhongxiang.vtt
 {
 	import flash.events.Event;
 	
-	public class VTTEvent extends Event
+	public class VTTLoaderEvent extends Event
 	{
 		public static const LOADED:String = "加载完成";
 		public static const ERROR:String = "加载失败";
 		
 		private var _data:*;
 		
-		public function VTTEvent(type:String, data:*, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function VTTLoaderEvent(type:String, data:*, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			_data = data;
 			super(type, bubbles, cancelable);

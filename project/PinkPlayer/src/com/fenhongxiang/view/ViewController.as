@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Copyright © 2015 FenHongXiang                                              */
-/* 深圳粉红象科技有限公司                                                                */
-/* www.fenhongxiang.com                                                       */
-/* All rights reserved.                                                       */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
 
 package com.fenhongxiang.view
 {
@@ -25,6 +24,7 @@ package com.fenhongxiang.view
 	import flash.display.StageAlign;
 	import flash.display.StageDisplayState;
 	import flash.display.StageScaleMode;
+	import flash.events.Event;
 	import flash.events.FullScreenEvent;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -33,21 +33,21 @@ package com.fenhongxiang.view
 	import flash.utils.Timer;
 	import flash.utils.clearTimeout;
 	import flash.utils.setTimeout;
-
-	final public class ViewController
+	
+	public final  class ViewController
 	{
 
 		public function ViewController(player:HLSPlayer, skin:MovieClip)
 		{
 			_player = player;
-			
+
 			if (_player)
 			{
-				_player.onPlayEnd=onVideoPlayEndHandler;
-				_player.onPlayStart=onVideoPlayStartHandler;
+				_player.onPlayEnd = onVideoPlayEndHandler;
+				_player.onPlayStart = onVideoPlayStartHandler;
 			}
-			_skin=skin;
-			
+			_skin = skin;
+
 			initSkinParts();
 		}
 
@@ -62,15 +62,17 @@ package com.fenhongxiang.view
 
 		private var _srtController:SRTController;
 		private var _stage:Stage;
-		private var _timer:Timer=new Timer(450);
+		private var _timer:Timer = new Timer(450);
 
-		private var _viewLocked:Boolean=false;
+		private var _viewLocked:Boolean = false;
 
 		private var _vttController:VTTControler;
 		private var bigPlayButton:SimpleButton;
 		private var controlBar:Sprite;
 		private var coverContainer:Sprite;
 		private var fullscreenButtonGroup:Sprite;
+
+		private var isFullScreen:Boolean = false;
 		private var miniProgressBar:MovieClip;
 
 
@@ -86,12 +88,12 @@ package com.fenhongxiang.view
 		private var timeClip:Sprite;
 		private var toogleButton:MovieClip;
 
-		private var tweenID:int=-1;
+		private var tweenID:int = -1;
 		private var volumeBar:MovieClip;
 
 		public function set coverPath(value:String):void
 		{
-			_coverPath=value;
+			_coverPath = value;
 
 			if (value)
 			{
@@ -101,17 +103,17 @@ package com.fenhongxiang.view
 
 		public function set onCoverButtonCallback(value:Function):void
 		{
-			_onCoverButtonCallback=value;
+			_onCoverButtonCallback = value;
 		}
 
 		public function set pauseADClickURL(value:String):void
 		{
-			_pauseADClickURL=value;
+			_pauseADClickURL = value;
 		}
 
 		public function set pauseADImagePath(value:String):void
 		{
-			_pauseADImagePath=value;
+			_pauseADImagePath = value;
 
 			if (value)
 			{
@@ -121,21 +123,20 @@ package com.fenhongxiang.view
 
 		public function set srtController(value:SRTController):void
 		{
-			_srtController=value;
+			_srtController = value;
 		}
 
 		public function set stage(value:Stage):void
 		{
-			_stage=value;
+			_stage = value;
 
 			if (_stage)
 			{
 				resizeSkin(_stage.stageWidth, _stage.stageHeight, false);
-				_stage.doubleClickEnabled=true;
-				_stage.addEventListener(MouseEvent.DOUBLE_CLICK, onStageDoubleClickHandler, false, 0, true);
 				_stage.addEventListener(KeyboardEvent.KEY_DOWN, onStageKeyDownHandler, false, 0, true);
 				_stage.addEventListener(FullScreenEvent.FULL_SCREEN, onStageFullScreenHandler, false, 0, true);
 				_stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMoveHandler, false, 0, true);
+				_stage.addEventListener(Event.RESIZE, onSWFResizeHandler, false, 0, true);
 			}
 		}
 
@@ -145,11 +146,11 @@ package com.fenhongxiang.view
 			{
 				if (vol < 0)
 				{
-					vol=0;
+					vol = 0;
 				}
 				else if (vol > 1)
 				{
-					vol=1;
+					vol = 1;
 				}
 
 				volumeBar.setVolume(vol);
@@ -158,15 +159,15 @@ package com.fenhongxiang.view
 
 		public function set vttController(value:VTTControler):void
 		{
-			_vttController=value;
+			_vttController = value;
 		}
 
 		private function initSkinParts():void
 		{
-			controlBar=SkinLoader.getInstance().getSkinPart("controlBar");
+			controlBar = SkinLoader.getInstance().getSkinPart("controlBar");
 
-			coverContainer=SkinLoader.getInstance().getSkinPart("coverContainer");
-			coverContainer.visible=true;
+			coverContainer = SkinLoader.getInstance().getSkinPart("coverContainer");
+			coverContainer.visible = true;
 			SimpleButton(coverContainer['bigPlayButton']).addEventListener(MouseEvent.CLICK, function onBigPlayClick(e:MouseEvent):void
 			{
 				if (_onCoverButtonCallback)
@@ -176,54 +177,61 @@ package com.fenhongxiang.view
 				}
 			});
 
-			pauseADContainer=SkinLoader.getInstance().getSkinPart("pauseADContainer");
-			pauseADContainer.visible=false;
+			pauseADContainer = SkinLoader.getInstance().getSkinPart("pauseADContainer");
+			pauseADContainer.visible = false;
 
-			settingButton=SkinLoader.getInstance().getSkinPart("controlBar", 'settingButton'); //设置按钮
-			settingButton.cacheAsBitmap=true;
+			settingButton = SkinLoader.getInstance().getSkinPart("controlBar", 'settingButton'); //设置按钮
+			settingButton.cacheAsBitmap = true;
 			settingButton.addEventListener(MouseEvent.CLICK, onSettinButtonClickHandler, false, 0, true);
 
-			bigPlayButton=SkinLoader.getInstance().getSkinPart("bigPlayButton"); //大播放按钮
-			bigPlayButton.cacheAsBitmap=true;
+			bigPlayButton = SkinLoader.getInstance().getSkinPart("bigPlayButton"); //大播放按钮
+			bigPlayButton.cacheAsBitmap = true;
 			bigPlayButton.addEventListener(MouseEvent.CLICK, onBigPlayButtonClickHandler, false, 0, true);
 
-			settingPanel=SkinLoader.getInstance().getSkinPart("settingPanel"); //设置按钮
-			settingPanel.cacheAsBitmap=true;
+			settingPanel = SkinLoader.getInstance().getSkinPart("settingPanel"); //设置按钮
+			settingPanel.cacheAsBitmap = true;
 
-			volumeBar=SkinLoader.getInstance().getSkinPart("controlBar", 'volumeBar'); //音量按钮
+			volumeBar = SkinLoader.getInstance().getSkinPart("controlBar", 'volumeBar'); //音量按钮
 			volumeBar.addEventListener(MouseEvent.CLICK, onVolumeBarClickHandler, false, 0, true);
 
-			toogleButton=SkinLoader.getInstance().getSkinPart("controlBar", 'toogleButton'); //暂停播放
+			toogleButton = SkinLoader.getInstance().getSkinPart("controlBar", 'toogleButton'); //暂停播放
 			toogleButton.addEventListener(MouseEvent.CLICK, onToogleButtonClickHandler, false, 0, true);
 
-			replayButton=SkinLoader.getInstance().getSkinPart("controlBar", 'replayButton'); //重播
+			replayButton = SkinLoader.getInstance().getSkinPart("controlBar", 'replayButton'); //重播
 			replayButton.addEventListener(MouseEvent.CLICK, onReplayButtonClickHandler, false, 0, true);
 
-			progressBar=SkinLoader.getInstance().getSkinPart("controlBar", 'progressBar'); //进度条
+			progressBar = SkinLoader.getInstance().getSkinPart("controlBar", 'progressBar'); //进度条
 			progressBar.addEventListener(MouseEvent.CLICK, onProgressBarClickHandler, false, 0, true);
 			progressBar.addEventListener(MouseEvent.MOUSE_MOVE, onProgressBarMoveHandler);
 
-			fullscreenButtonGroup=SkinLoader.getInstance().getSkinPart("controlBar", 'fullscreenButtonGroup'); //全屏按钮组
+			fullscreenButtonGroup = SkinLoader.getInstance().getSkinPart("controlBar", 'fullscreenButtonGroup'); //全屏按钮组
 			fullscreenButtonGroup.addEventListener(MouseEvent.CLICK, toggleFullScreen, false, 0, true);
 
-			miniProgressBar=SkinLoader.getInstance().getSkinPart("miniProgressBar"); //迷你进度条
+			miniProgressBar = SkinLoader.getInstance().getSkinPart("miniProgressBar"); //迷你进度条
 
-			timeClip=SkinLoader.getInstance().getSkinPart("controlBar", 'timeClip'); //时间显示
+			timeClip = SkinLoader.getInstance().getSkinPart("controlBar", 'timeClip'); //时间显示
 
-			var thumbContainer:MovieClip=SkinLoader.getInstance().getSkinPart("controlBar", 'thumbContainer');
+			var thumbContainer:MovieClip = SkinLoader.getInstance().getSkinPart("controlBar", 'thumbContainer');
 			if (thumbContainer)
 			{
-				thumbContainer.mouseChildren=false;
-				thumbContainer.mouseEnabled=false;
-				thumbImg=new Bitmap(new BitmapData(100, 60));
-				thumbImg.x=-50;
-				thumbImg.y=-30;
+				thumbContainer.mouseChildren = false;
+				thumbContainer.mouseEnabled = false;
+				thumbImg = new Bitmap(new BitmapData(100, 60));
+				thumbImg.x = -50;
+				thumbImg.y = -30;
 				thumbContainer.addChild(thumbImg);
 			}
 
-			srtTextField=SkinLoader.getInstance().getSkinPart("srtTextField");
-			
+			srtTextField = SkinLoader.getInstance().getSkinPart("srtTextField");
+
 			playerContainer = SkinLoader.getInstance().getSkinPart("videoContainer");
+			
+			if (playerContainer != null)
+			{
+				playerContainer.doubleClickEnabled = true;
+				playerContainer.mouseChildren = false;
+				playerContainer.addEventListener(MouseEvent.DOUBLE_CLICK, onStageDoubleClickHandler, false, 0, true);
+			}
 
 			if (_player)
 			{
@@ -231,7 +239,7 @@ package com.fenhongxiang.view
 				_timer.addEventListener(TimerEvent.TIMER, updateView);
 				_timer.reset();
 				_timer.start();
-				_player.volume=volumeBar.getVolume();
+				_player.volume = volumeBar.getVolume();
 			}
 
 			if (_stage)
@@ -244,9 +252,9 @@ package com.fenhongxiang.view
 		{
 			if (coverContainer && _coverPath)
 			{
-				var coverLdr:CoverLoader=new CoverLoader(coverContainer.width, coverContainer.height);
+				var coverLdr:CoverLoader = new CoverLoader(coverContainer.width, coverContainer.height);
 				coverLdr.load(_coverPath);
-				coverContainer['imageContainer'].mouseEnabled=false;
+				coverContainer['imageContainer'].mouseEnabled = false;
 				coverContainer['imageContainer'].addChild(coverLdr);
 			}
 		}
@@ -255,21 +263,21 @@ package com.fenhongxiang.view
 		{
 			if (pauseADContainer && _pauseADImagePath)
 			{
-				var adLdr:CoverLoader=new CoverLoader(pauseADContainer.width, pauseADContainer.height);
+				var adLdr:CoverLoader = new CoverLoader(pauseADContainer.width, pauseADContainer.height);
 				adLdr.load(_pauseADImagePath);
-				adLdr.buttonMode=true;
-				adLdr.useHandCursor=true;
+				adLdr.buttonMode = true;
+				adLdr.useHandCursor = true;
 				adLdr.addEventListener(MouseEvent.CLICK, function onADClickHandler(e:MouseEvent):void
 				{
 					onPauseADClickHandler(e);
 				});
 
-				pauseADContainer['adImageContainer'].mouseEnabled=false;
+				pauseADContainer['adImageContainer'].mouseEnabled = false;
 				pauseADContainer['adImageContainer'].addChild(adLdr);
 
 				SimpleButton(pauseADContainer['closeButton']).addEventListener(MouseEvent.CLICK, function onADCloseButtonClick(e:MouseEvent):void
 				{
-					pauseADContainer.visible=false;
+					pauseADContainer.visible = false;
 				});
 			}
 		}
@@ -288,6 +296,14 @@ package com.fenhongxiang.view
 				}
 			}
 		}
+		
+		private function onSWFResizeHandler(e:Event):void
+		{
+			if (_stage)
+			{
+				resizeSkin(_stage.stageWidth, _stage.stageHeight);
+			}
+		}
 
 		private function onPauseADClickHandler(e:MouseEvent):void
 		{
@@ -299,13 +315,13 @@ package com.fenhongxiang.view
 
 		private function onProgressBarClickHandler(e:MouseEvent):void
 		{
-			var playedProgress:Number=e.currentTarget.mouseX / progressBar.width;
-			_viewLocked=true;
+			var playedProgress:Number = e.currentTarget.mouseX / progressBar.width;
+			_viewLocked = true;
 
 			if (_player)
 			{
 				_player.seek(playedProgress, true);
-				_viewLocked=false;
+				_viewLocked = false;
 			}
 		}
 
@@ -313,14 +329,14 @@ package com.fenhongxiang.view
 		{
 			if (_player)
 			{
-				var timePos:Number=e.currentTarget.mouseX / progressBar.width * _player.duration;
+				var timePos:Number = e.currentTarget.mouseX / progressBar.width * _player.duration;
 
 				if (_vttController)
 					_vttController.renderImage(timePos, thumbImg.bitmapData);
 
 				if (timeClip)
 				{
-					timeClip['timeLb']['text']=TimeUtil.getTimeString(timePos);
+					timeClip['timeLb']['text'] = TimeUtil.getTimeString(timePos);
 				}
 			}
 		}
@@ -337,21 +353,25 @@ package com.fenhongxiang.view
 		{
 			if (settingPanel)
 			{
-				settingPanel.visible=!settingPanel.visible;
+				settingPanel.visible = !settingPanel.visible;
 
 				if (_stage)
 				{
-					settingPanel.x=(_stage.stageWidth - settingPanel.width) / 2;
-					settingPanel.y=(_stage.stageHeight - settingPanel.height) / 2;
+					settingPanel.x = (_stage.stageWidth - settingPanel.width) / 2;
+					settingPanel.y = (_stage.stageHeight - settingPanel.height) / 2;
 				}
 			}
 		}
 
-		private var isFullScreen:Boolean = false;
+		private function onStageDoubleClickHandler(e:MouseEvent):void
+		{
+			toggleFullScreen();
+		}
+
 		private function onStageFullScreenHandler(e:FullScreenEvent):void
 		{
 			isFullScreen = e.fullScreen;
-			
+
 			if (e.fullScreen)
 			{
 				if (controlBar && _stage)
@@ -383,28 +403,20 @@ package com.fenhongxiang.view
 			}
 			else if (e.keyCode == 38) //上箭头
 			{
-				var upVol:Number=volumeBar.getVolume() + 0.1;
-				_player.volume=upVol;
+				var upVol:Number = volumeBar.getVolume() + 0.1;
+				_player.volume = upVol;
 				updateVolumeView(upVol)
 			}
 			else if (e.keyCode == 40)
 			{ // 下箭头
-				var downVol:Number=volumeBar.getVolume() - 0.1;
+				var downVol:Number = volumeBar.getVolume() - 0.1;
 
-				_player.volume=downVol;
+				_player.volume = downVol;
 				updateVolumeView(downVol)
 			}
 			else if (e.keyCode == 32)
 			{ //  空格键: 暂停切换
 				_player.togglePause();
-			}
-		}
-		
-		private function onStageDoubleClickHandler(e:MouseEvent):void
-		{
-			if (e.type == MouseEvent.DOUBLE_CLICK)
-			{
-				toggleFullScreen();
 			}
 		}
 
@@ -417,15 +429,15 @@ package com.fenhongxiang.view
 
 			if (controlBar)
 			{
-				controlBar.visible=true;
+				controlBar.visible = true;
 			}
 
 			if (miniProgressBar)
 			{
-				miniProgressBar.visible=false;
+				miniProgressBar.visible = false;
 			}
 
-			tweenID=setTimeout(toogleMiniBar, 6000);
+			tweenID = setTimeout(toogleMiniBar, 6000);
 		}
 
 		private function onToogleButtonClickHandler(e:MouseEvent):void
@@ -436,7 +448,7 @@ package com.fenhongxiang.view
 
 				if (pauseADContainer && _pauseADImagePath)
 				{
-					pauseADContainer.visible=!_player.isPlaying;
+					pauseADContainer.visible = !_player.isPlaying;
 				}
 			}
 		}
@@ -445,12 +457,12 @@ package com.fenhongxiang.view
 		{
 			if (replayButton)
 			{
-				replayButton.visible=true;
+				replayButton.visible = true;
 			}
 
 			if (toogleButton)
 			{
-				toogleButton.visible=false;
+				toogleButton.visible = false;
 			}
 		}
 
@@ -458,12 +470,12 @@ package com.fenhongxiang.view
 		{
 			if (replayButton)
 			{
-				replayButton.visible=false;
+				replayButton.visible = false;
 			}
 
 			if (toogleButton)
 			{
-				toogleButton.visible=true;
+				toogleButton.visible = true;
 			}
 		}
 
@@ -471,7 +483,7 @@ package com.fenhongxiang.view
 		{
 			if (_player)
 			{
-				_player.volume=volumeBar.getVolume();
+				_player.volume = volumeBar.getVolume();
 			}
 		}
 
@@ -482,150 +494,151 @@ package com.fenhongxiang.view
 		 * @param isFull 是否全屏状态 （控制全屏按钮状态显示）
 		 *
 		 */
-		private function resizeSkin(newWidth:Number, newHeight:Number, isFull:Boolean=false):void
+		private function resizeSkin(newWidth:Number, newHeight:Number, isFull:Boolean = false):void
 		{
-			var defaultBarWidth:Number=controlBar.width;
+			var defaultBarWidth:Number = controlBar.width;
 
 			if (coverContainer)
 			{
-				var imageContainer:MovieClip=coverContainer['imageContainer'];
+				var imageContainer:MovieClip = coverContainer['imageContainer'];
 				if (imageContainer)
 				{
-					imageContainer.width=newWidth;
-					imageContainer.height=newHeight;
+					imageContainer.width = newWidth;
+					imageContainer.height = newHeight;
 				}
 
-				var bigPlayBtn:SimpleButton=coverContainer['bigPlayButton'];
+				var bigPlayBtn:SimpleButton = coverContainer['bigPlayButton'];
 				if (bigPlayBtn)
 				{
-					bigPlayBtn.x=newWidth / 2;
-					bigPlayBtn.y=newHeight / 2;
+					bigPlayBtn.x = newWidth / 2;
+					bigPlayBtn.y = newHeight / 2;
 				}
 			}
 
 			if (bigPlayButton)
 			{
-				bigPlayButton.x=newWidth / 2;
-				bigPlayButton.y=newHeight / 2;
+				bigPlayButton.x = newWidth / 2;
+				bigPlayButton.y = newHeight / 2;
 			}
 
 			if (pauseADContainer)
 			{
 				if (newWidth < pauseADContainer.width)
 				{
-					var closeBtn:SimpleButton=pauseADContainer['closeButton'];
+					var closeBtn:SimpleButton = pauseADContainer['closeButton'];
 					if (closeBtn)
 					{
-						closeBtn.x=newWidth - closeBtn.width - 20;
+						closeBtn.x = newWidth - closeBtn.width - 20;
 					}
 
-					var pauseImageContainer:MovieClip=pauseADContainer["adImageContainer"];
+					var pauseImageContainer:MovieClip = pauseADContainer["adImageContainer"];
 
 					if (pauseImageContainer)
 					{
-						pauseImageContainer.width=newWidth - 20;
+						pauseImageContainer.width = newWidth - 20;
 					}
 				}
 
-				pauseADContainer.x=(newWidth - pauseADContainer.width) / 2;
-				pauseADContainer.y=(newHeight - pauseADContainer.height) / 2;
+				pauseADContainer.x = (newWidth - pauseADContainer.width) / 2;
+				pauseADContainer.y = (newHeight - pauseADContainer.height) / 2;
 			}
 
 			if (controlBar['background'])
 			{
-				defaultBarWidth=controlBar['background'].width;
+				defaultBarWidth = controlBar['background'].width;
 			}
 
 			if (SkinLoader.getInstance().getSkinPart("logo"))
 			{
-				SkinLoader.getInstance().getSkinPart("logo").x=newWidth - (defaultBarWidth - SkinLoader.getInstance().getSkinPart("logo").x);
+				SkinLoader.getInstance().getSkinPart("logo").x = newWidth - (defaultBarWidth - SkinLoader.getInstance().getSkinPart("logo").x);
 			}
 
 			if (controlBar)
 			{
-				controlBar.y=newHeight - 45;
+				controlBar.y = newHeight - 45;
 			}
 
 			if (settingButton)
 			{
-				settingButton.x=newWidth - (defaultBarWidth - settingButton.x)
+				settingButton.x = newWidth - (defaultBarWidth - settingButton.x)
 			}
 
 			if (volumeBar)
 			{
-				volumeBar.x=newWidth - (defaultBarWidth - volumeBar.x)
+				volumeBar.x = newWidth - (defaultBarWidth - volumeBar.x)
 			}
 
 			if (progressBar)
 			{
-				for (var i:int=0; i < progressBar.numChildren; i++)
+				for (var i:int = 0; i < progressBar.numChildren; i++)
 				{
-					progressBar.getChildAt(i).width=newWidth - progressBar.x - 210;
+					progressBar.getChildAt(i).width = newWidth - progressBar.x - 210;
 				}
 			}
 
 			if (miniProgressBar)
 			{
-				miniProgressBar.y=newHeight - miniProgressBar.height;
-				miniProgressBar.x=0;
+				miniProgressBar.y = newHeight - miniProgressBar.height;
+				miniProgressBar.x = 0;
 
-				for (var j:int=0; j < progressBar.numChildren; j++)
+				for (var j:int = 0; j < progressBar.numChildren; j++)
 				{
-					miniProgressBar.getChildAt(j).width=newWidth;
+					miniProgressBar.getChildAt(j).width = newWidth;
 				}
 			}
 
 			if (controlBar['totalTime'])
 			{
-				controlBar['totalTime'].x=newWidth - (defaultBarWidth - controlBar['totalTime'].x)
+				controlBar['totalTime'].x = newWidth - (defaultBarWidth - controlBar['totalTime'].x)
 			}
 
 			if (controlBar['fullscreenButtonGroup'])
 			{
-				controlBar['fullscreenButtonGroup'].x=newWidth - (defaultBarWidth - controlBar['fullscreenButtonGroup'].x);
+				controlBar['fullscreenButtonGroup'].x = newWidth - (defaultBarWidth - controlBar['fullscreenButtonGroup'].x);
 
 				if (controlBar['fullscreenButtonGroup']['inFullBtn'])
 				{
-					controlBar['fullscreenButtonGroup']['inFullBtn'].visible=!isFull;
+					controlBar['fullscreenButtonGroup']['inFullBtn'].visible = !isFull;
 				}
 
 				if (controlBar['fullscreenButtonGroup']['quitFullBtn'])
 				{
-					controlBar['fullscreenButtonGroup']['quitFullBtn'].visible=isFull;
+					controlBar['fullscreenButtonGroup']['quitFullBtn'].visible = isFull;
 				}
 			}
 
 			if (controlBar['currentTime'])
 			{
-				controlBar['currentTime'].x=newWidth - (defaultBarWidth - controlBar['currentTime'].x)
+				controlBar['currentTime'].x = newWidth - (defaultBarWidth - controlBar['currentTime'].x)
 			}
 
 			if (controlBar['timeSpacer'])
 			{
-				controlBar['timeSpacer'].x=newWidth - (defaultBarWidth - controlBar['timeSpacer'].x)
+				controlBar['timeSpacer'].x = newWidth - (defaultBarWidth - controlBar['timeSpacer'].x)
 			}
 
 			if (controlBar['background'])
 			{
-				controlBar['background'].width=newWidth;
+				controlBar['background'].width = newWidth;
 			}
 
 			if (settingPanel)
 			{
-				settingPanel.x=(newWidth - settingPanel.width) / 2;
-				settingPanel.y=(newHeight - settingPanel.height) / 2;
+				settingPanel.x = (newWidth - settingPanel.width) / 2;
+				settingPanel.y = (newHeight - settingPanel.height) / 2;
 			}
 
 			if (_player)
 			{
 				_player.resize(newWidth, newHeight);
 			}
-			
+
 			if (srtTextField)
 			{
 				srtTextField.width = newWidth;
-				srtTextField.y = newHeight - (isFull?200:90);
+				srtTextField.y = newHeight - (isFull ? 200 : 90);
 			}
+			
 		}
 
 		private function get stepGap():Number
@@ -633,20 +646,21 @@ package com.fenhongxiang.view
 			return Math.max(3.0, 0.01 * _player.duration);
 		}
 
-		private function toggleFullScreen(e:MouseEvent=null):void
+		private function toggleFullScreen(e:MouseEvent = null):void
 		{
 			if (_stage)
 			{
 				if (_stage.displayState == StageDisplayState.FULL_SCREEN)
 				{
-					_stage.scaleMode=StageScaleMode.SHOW_ALL;
-					_stage.displayState=StageDisplayState.NORMAL;
+					_stage.scaleMode = StageScaleMode.NO_SCALE;
+					_stage.align = StageAlign.TOP_LEFT;
+					_stage.displayState = StageDisplayState.NORMAL;
 				}
 				else
 				{
-					_stage.scaleMode=StageScaleMode.NO_SCALE;
-					_stage.align=StageAlign.TOP_LEFT;
-					_stage.displayState=StageDisplayState.FULL_SCREEN;
+					_stage.scaleMode = StageScaleMode.NO_SCALE;
+					_stage.align = StageAlign.TOP_LEFT;
+					_stage.displayState = StageDisplayState.FULL_SCREEN;
 				}
 			}
 		}
@@ -655,16 +669,13 @@ package com.fenhongxiang.view
 		{
 			if (miniProgressBar)
 			{
-				miniProgressBar.visible=!miniProgressBar.visible;
+				miniProgressBar.visible = !miniProgressBar.visible;
 			}
 
 			if (controlBar)
 			{
-				controlBar.visible=!controlBar.visible;
+				controlBar.visible = !controlBar.visible;
 			}
-//				miniProgressBar.visible=true;
-//				TweenNano.to(target, .35, {alpha: 0.0, overwrite: false});
-//				TweenNano.to(miniProgressBar, .35, {alpha: 1.0, overwrite: false});
 		}
 
 		private function updateView(e:TimerEvent):void
@@ -685,43 +696,43 @@ package com.fenhongxiang.view
 
 				if (progressBar)
 				{
-					progressBar['loadedTrack'].width=_player.loadedPercent * progressBar['baseTrack'].width;
-					progressBar['playedTrack'].width=_player.playedPercent * progressBar['baseTrack'].width;
+					progressBar['loadedTrack'].width = _player.loadedPercent * progressBar['baseTrack'].width;
+					progressBar['playedTrack'].width = _player.playedPercent * progressBar['baseTrack'].width;
 				}
 
 				if (miniProgressBar)
 				{
-					miniProgressBar['loadedTrack'].width=_player.loadedPercent * miniProgressBar['baseTrack'].width;
-					miniProgressBar['playedTrack'].width=_player.playedPercent * miniProgressBar['baseTrack'].width;
+					miniProgressBar['loadedTrack'].width = _player.loadedPercent * miniProgressBar['baseTrack'].width;
+					miniProgressBar['playedTrack'].width = _player.playedPercent * miniProgressBar['baseTrack'].width;
 				}
 
 				if (bigPlayButton)
 				{
-					bigPlayButton.visible=!_player.isPlaying;
+					bigPlayButton.visible = !_player.isPlaying;
 				}
 
 				if (controlBar)
 				{
-					controlBar['currentTime'].text=TimeUtil.getTimeString(_player.time);
-					controlBar['totalTime'].text=TimeUtil.getTimeString(_player.duration);
+					controlBar['currentTime'].text = TimeUtil.getTimeString(_player.time);
+					controlBar['totalTime'].text = TimeUtil.getTimeString(_player.duration);
 				}
 
 				if (_player.isPlaying)
 				{
-					toogleButton.visible=true;
-					replayButton.visible=false;
+					toogleButton.visible = true;
+					replayButton.visible = false;
 					toogleButton.setButtonState("pause");
 				}
 				else
 				{
 					if (_player.stoped)
 					{
-						toogleButton.visible=false;
-						replayButton.visible=true;
+						toogleButton.visible = false;
+						replayButton.visible = true;
 					}
 					else
 					{
-						toogleButton.visible=true;
+						toogleButton.visible = true;
 						toogleButton.setButtonState("play");
 					}
 				}

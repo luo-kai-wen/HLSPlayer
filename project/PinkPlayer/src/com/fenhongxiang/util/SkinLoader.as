@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Copyright © 2015 FenHongXiang                                              */
-/* 深圳粉红象科技有限公司                                                               										  */
-/* www.fenhongxiang.com                                                       */
-/* All rights reserved.                                                       */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
 
 package com.fenhongxiang.util
 {
@@ -16,19 +15,19 @@ package com.fenhongxiang.util
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.URLRequest;
-
+	
 	public class SkinLoader extends EventDispatcher
 	{
 
-		static private var instance:SkinLoader;
+		private static var instance:SkinLoader;
 
-		static public function getInstance():SkinLoader
+		public static function getInstance():SkinLoader
 		{
 			if (SkinLoader.instance == null)
 			{
-
-				SkinLoader.instance=new SkinLoader(new Enforcer());
+				SkinLoader.instance = new SkinLoader(new Enforcer());
 			}
+
 			return SkinLoader.instance;
 		}
 
@@ -44,7 +43,7 @@ package com.fenhongxiang.util
 		private var _loader:Loader;
 		private var _skinContent:MovieClip;
 
-		public function getSkinPart(name:String, prop:String=null):*
+		public function getSkinPart(name:String, prop:String = null):*
 		{
 			if (_skinContent != null && _skinContent.hasOwnProperty(name))
 			{
@@ -65,11 +64,11 @@ package com.fenhongxiang.util
 
 		public function load(url:String, callBack:Function):void
 		{
-			_callBackFunction=callBack;
+			_callBackFunction = callBack;
 
 			if (_loader == null)
 			{
-				_loader=new Loader();
+				_loader = new Loader();
 				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadedHandler, false, 0, true);
 				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler, false, 0, true);
 				_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoadErrorHandler, false, 0, true);
@@ -82,7 +81,6 @@ package com.fenhongxiang.util
 			catch (e:*)
 			{
 				//
-
 			}
 
 			try
@@ -100,40 +98,41 @@ package com.fenhongxiang.util
 			return _skinContent;
 		}
 
-		private function onLoadErrorHandler(e:*=null):void
+		private function onLoadErrorHandler(e:* = null):void
 		{
-			_skinContent=null;
+			_skinContent = null;
 
 			if (_callBackFunction != null)
 			{
 				_callBackFunction(null);
 			}
 
-			removeListeners();
+			dispose();
 		}
 
 		private function onLoadedHandler(e:Event):void
 		{
 
-			_skinContent=e.target.content;
+			_skinContent = e.target.content;
 
 			if (_callBackFunction != null)
 			{
 				_callBackFunction(_skinContent);
 			}
 
-			removeListeners();
+			dispose();
 		}
 
-		private function removeListeners():void
+		private function dispose():void
 		{
 			if (_loader)
 			{
 				_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadedHandler);
 				_loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 				_loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoadErrorHandler);
+				_loader = null;
 			}
-			
+
 			_callBackFunction = null;
 		}
 	}

@@ -1,11 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Copyright © 2015 FenHongXiang                                              */
-/* 深圳粉红象科技有限公司                                                               										  */
-/* www.fenhongxiang.com                                                       */
-/* All rights reserved.                                                       */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
+
 package com.fenhongxiang
 {
 	import com.fenhongxiang.hls.HLS;
@@ -23,7 +23,7 @@ package com.fenhongxiang
 
 	public class HLSPlayer extends Sprite
 	{
-		
+
 		public function HLSPlayer()
 		{
 			HLSSettings.maxBufferLength = 30;
@@ -33,7 +33,7 @@ package com.fenhongxiang
 		private var _autoPlay:Boolean = false;
 		private var _backgroundColor:uint = 0x000000;
 		private var _duration:Number = 0;
-		private var _fileLoaded:Boolean=false;
+		private var _fileLoaded:Boolean = false;
 		private var _forcePlay:Boolean = false;
 		private var _height:Number = 300;
 		private var _hls:HLS;
@@ -44,26 +44,21 @@ package com.fenhongxiang
 		private var _onPlayError:Function = null;
 		private var _onPlayStart:Function = null;
 		private var _onPlayStateChange:Function = null;
-		private var _preload:Boolean=false;
+		private var _preload:Boolean = false;
+		private var _stoped:Boolean = false;
 		private var _time:Number = 0;
 		private var _url:String;
 		private var _video:Video;
 		private var _viewDirty:Boolean = true;
 		private var _vol:Number = 0.6;
 		private var _width:Number = 300;
-		private var _stoped:Boolean = false;
+		private var _videoRatio:Number = 1.78;//默认宽高比 16：9
 
-		public function get stoped():Boolean
-		{
-			return _stoped;
-		}
-
-		
 		public function set autoPlay(auto:Boolean):void
 		{
 			_autoPlay = auto;
 		}
-		
+
 		public function set backgroundColor(color:uint):void
 		{
 			if (_backgroundColor != color)
@@ -72,18 +67,18 @@ package com.fenhongxiang
 				invalidateDisplaylist();
 			}
 		}
-		
+
 		public function get duration():Number
 		{
 			return _duration;
 		}
-		
-		override public  function get height():Number
+
+		override public function get height():Number
 		{
 			return _height;
 		}
-		
-		override public  function set height(value:Number):void
+
+		override public function set height(value:Number):void
 		{
 			if (_height != value)
 			{
@@ -91,7 +86,7 @@ package com.fenhongxiang
 				invalidateDisplaylist();
 			}
 		}
-		
+
 		public function get isBuffering():Boolean
 		{
 			return _isBuffering;
@@ -101,47 +96,48 @@ package com.fenhongxiang
 		{
 			return _isPlaying;
 		}
-		
+
 		public function get loadedPercent():Number
 		{
 			return _loadedPercent > 1 ? 1 : _loadedPercent;
 		}
+
 		//---------------------------------------------callback methods-----------------------------------------------------------//
 		public function set onPlayEnd(func:Function):void
 		{
 			_onPlayEnd = func;
 		}
-		
+
 		public function set onPlayError(func:Function):void
 		{
 			_onPlayError = func;
 		}
-		
+
 		public function set onPlayStart(func:Function):void
 		{
 			_onPlayStart = func;
 		}
-	
+
 		public function set onPlayStateChange(value:Function):void
 		{
 			_onPlayStateChange = value;
 		}
-		
+
 		//----------------------------------------------interface methods---------------------------------------------------------//
 		public function pause():Number
 		{
 			if (ObjectUtil.available(_hls, ['stream']))
 			{
 				_hls.stream.pause();
-				
+
 				return _hls.stream.time;
 			}
-			
+
 			return 0.0;
 		}
-		
-		public function play(pos:Number=-1):void
-		{	
+
+		public function play(pos:Number = -1):void
+		{
 			if (_fileLoaded)
 			{
 				if (_onPlayStart)
@@ -150,7 +146,7 @@ package com.fenhongxiang
 				}
 				_isPlaying = true;
 				_stoped = false;
-				
+
 				_hls.stream.play(null, pos);
 			}
 			else if (url)
@@ -159,16 +155,16 @@ package com.fenhongxiang
 				load(url);
 			}
 		}
-		
+
 		public function get playedPercent():Number
 		{
-			var per:Number = _hls.position/_duration;
-			
-			if(isNaN(per))
+			var per:Number = _hls.position / _duration;
+
+			if (isNaN(per))
 			{
 				per = 0.0;
 			}
-			
+
 			return per > 1 ? 1 : per;
 		}
 
@@ -176,37 +172,35 @@ package com.fenhongxiang
 		{
 			_preload = value;
 		}
-		
+
 		public function resize(w:Number, h:Number):void
 		{
 			var needUpdate:Boolean = false;
-			
-			if (_width != w)
+
+			if (_width != w || _height != h)
 			{
-				_width = w;
 				needUpdate = true;
 			}
 			
-			if (_height != h)
-			{
-				_height = h;
-				needUpdate = true;
-			}
-			
+			_width = w;
+			_height = h;
+
 			if (needUpdate)
 			{
 				invalidateDisplaylist();
 			}
 		}
-		
-		public function seek(pos:Number, autoPlay:Boolean=false):void
-		{			
+
+		public function seek(pos:Number, autoPlay:Boolean = false):void
+		{
 			if (ObjectUtil.available(_hls, ['stream']))
 			{
 				_hls.stream.seek(pos * _duration);
 				_hls.stream.pause();
+				
 				_isPlaying = false;
 				_stoped = false;
+				
 				if (autoPlay)
 				{
 					_isPlaying = true;
@@ -214,11 +208,11 @@ package com.fenhongxiang
 				}
 			}
 		}
-		
+
 		public function step(size:Number):void
 		{
 			var newPos:Number = _hls.position + size;
-			
+
 			if (newPos < 0)
 			{
 				newPos = 0;
@@ -227,29 +221,34 @@ package com.fenhongxiang
 			{
 				newPos = duration - 1.0;
 			}
-			
-			seek(newPos/duration, true);
+
+			seek(newPos / duration, true);
 		}
-		
+
+		public function get stoped():Boolean
+		{
+			return _stoped;
+		}
+
 		/**
-		 * return the current playhead position 
+		 * return the current playhead position
 		 * */
 		public function get time():Number
 		{
-			return _hls.position < 0 ? 0: _hls.position;
+			return _hls.position < 0 ? 0 : _hls.position;
 		}
-		
+
 		public function togglePause():void
 		{
 			if (ObjectUtil.available(_hls, ['stream']))
 			{
 				_isPlaying = !_isPlaying;
-				
+
 				//这里有一个缓存问题，flashplayer的视图有可能不会更新
 				HLSNetStream(_hls.stream).togglePause();
 			}
 		}
-		
+
 		//-------------------------------------getters and setters-------------------------------------------------------------//
 		public function get url():String
 		{
@@ -262,19 +261,19 @@ package com.fenhongxiang
 			{
 				_url = value;
 				_fileLoaded = false;
-				
+
 				if (_preload && _url)
 				{
 					load(_url);
 				}
 			}
 		}
-		
+
 		public function get volume():Number
 		{
 			return _vol;
 		}
-		
+
 		public function set volume(vol:Number):void
 		{
 			if (vol > 1)
@@ -285,30 +284,24 @@ package com.fenhongxiang
 			{
 				vol = 0.0;
 			}
-			
+
 			if (_vol != vol)
 			{
 				_vol = vol;
-				
+
 				if (ObjectUtil.available(_hls, ['stream']))
 				{
-					trace(_vol+"VOL");
-					
 					SoundMixer.soundTransform = new SoundTransform(_vol);
-//					var stf:SoundTransform = _hls.stream.soundTransform;
-//						stf.volume = _vol;
-//					
-//					_hls.stream.soundTransform = stf;
 				}
 			}
 		}
-		
-		override public  function get width():Number
+
+		override public function get width():Number
 		{
 			return _width;
 		}
-		
-		override public  function set width(value:Number):void
+
+		override public function set width(value:Number):void
 		{
 			if (_width != value)
 			{
@@ -327,9 +320,9 @@ package com.fenhongxiang
 				this.stage.invalidate();
 			}
 		}
-				
+
 		//-----------------------------------------------------------------------------------------------------------------------//
-		
+
 		private function load(url:String):void
 		{
 			if (_hls == null)
@@ -338,33 +331,40 @@ package com.fenhongxiang
 				_hls.addEventListener(HLSEvent.ERROR, onHLSErrorHandler, false, 0, true);
 				_hls.addEventListener(HLSEvent.MANIFEST_LOADED, onPlayListLoadedHandler, false, 0, true);
 			}
-			
+
 			_hls.load(url);
 		}
-		
+
 		private function onAddToStageHandler(e:Event):void
 		{
 			this.removeEventListener(Event.ADDED_TO_STAGE, onAddToStageHandler);
 			this.addEventListener(Event.RENDER, onRenderHandler, false, 0, true);
-			
+
 			_hls = new HLS();
 			_hls.stage = this.stage;
 			_hls.addEventListener(HLSEvent.ERROR, onHLSErrorHandler, false, 0, true);
 			_hls.addEventListener(HLSEvent.MANIFEST_LOADED, onPlayListLoadedHandler, false, 0, true);
-			
+			_hls.addEventListener(HLSEvent.LEVEL_SWITCH, onPlayLevelSwitchHandler, false, 0, true);
+
+
 			_video = new Video(_width, _height);
 			_video.smoothing = true;
 			_video.attachNetStream(_hls.stream);
 			this.addChild(_video);
-			
+
 			if (_preload && _url)
 			{
 				load(_url);
 			}
-			
+
 			invalidateDisplaylist();
 		}
 		
+		private function onPlayLevelSwitchHandler(e:HLSEvent):void
+		{
+			_videoRatio = _hls.levels[_hls.currentLevel].width/_hls.levels[_hls.currentLevel].height;
+		}
+
 		private function onHLSErrorHandler(e:HLSEvent):void
 		{
 			if (_onPlayError != null)
@@ -372,38 +372,39 @@ package com.fenhongxiang
 				_onPlayError(e.error.msg);
 			}
 		}
-		
+
 		private function onMediaTimeChangeHandler(e:HLSEvent):void
 		{
 			//data: { mediatime : HLSMediatime}
-			 _time = Number(e.mediatime.position.toFixed(4));
-			 _loadedPercent = Number((( e.mediatime.position +  e.mediatime.buffer) /  e.mediatime.duration).toFixed(4));
+			_time = Number(e.mediatime.position.toFixed(4));
+			_loadedPercent = Number(((e.mediatime.position + e.mediatime.buffer) / e.mediatime.duration).toFixed(4));
 		}
-		
+
 		private function onPlayBackStop(e:HLSEvent):void
 		{
 			//_hls.removeEventListener(HLSEvent.PLAYBACK_COMPLETE, onPlayBackStop);
 			//stop();
 			_isPlaying = false;
 			_stoped = true;
-			
+
 			if (_onPlayEnd != null)
 			{
 				_onPlayEnd.call();
 			}
 		}
-		
+
 		/**
 		 * 视频m3u8列表文件加载完成
 		 * */
-		private function onPlayListLoadedHandler(event:HLSEvent):void 
+		private function onPlayListLoadedHandler(event:HLSEvent):void
 		{
 			_hls.removeEventListener(HLSEvent.MANIFEST_LOADED, onPlayListLoadedHandler);
 			_fileLoaded = true;
-			
+
 			//计算总时间
 			_duration = event.levels[_hls.startLevel].duration;
-			
+			_videoRatio = _hls.levels[_hls.startLevel].width/_hls.levels[_hls.startLevel].height;
+
 			if (_autoPlay || _forcePlay)
 			{
 				_forcePlay = false;
@@ -415,12 +416,12 @@ package com.fenhongxiang
 			}
 			
 			_hls.addEventListener(HLSEvent.PLAYBACK_COMPLETE, onPlayBackStop, false, 0, true);
-			_hls.addEventListener(HLSEvent.MEDIA_TIME, onMediaTimeChangeHandler, false, 0, true);//triggered when media position gets updated
+			_hls.addEventListener(HLSEvent.MEDIA_TIME, onMediaTimeChangeHandler, false, 0, true); //triggered when media position gets updated
 			_hls.addEventListener(HLSEvent.PLAYBACK_STATE, onStreamPlayBackStateChange, false, 0, true);
 		}
-		
+
 		//--------------------------------------------event handlers------------------------------------------------------------//
-		
+
 		private function onRenderHandler(e:Event):void
 		{
 			if (_viewDirty)
@@ -430,20 +431,40 @@ package com.fenhongxiang
 				this.graphics.drawRect(0, 0, _width, _height);
 				this.graphics.endFill();
 				
-				if (_video)
+				var currentRatio:Number = _width / _height;
+				
+				if (currentRatio == _videoRatio)
+				{
+					_video.height = _height;
+					_video.width = _width;
+					_video.x = 0;
+					_video.y = 0;
+				}
+				else if (currentRatio > _videoRatio)
+				{
+					_video.height = _height;
+					
+					_video.width = _height * _videoRatio;
+					
+					_video.x = (_width - _video.width)/2;
+					_video.y = 0;
+				}
+				else
 				{
 					_video.width = _width;
-					_video.height = _height;
+					_video.height = _width / _videoRatio;
+					_video.x = 0;
+					_video.y = (_height - _video.height)/2;
 				}
-				
+
 				_viewDirty = false;
 			}
 		}
-		
+
 		//IDLE/PLAYING/PAUSED/PLAYING_BUFFERING/PAUSED_BUFFERING
 		private function onStreamPlayBackStateChange(e:HLSEvent):void
-		{		
-			switch(e.state)
+		{
+			switch (e.state)
 			{
 				case HLSPlayStates.PAUSED_BUFFERING:
 				case HLSPlayStates.PLAYING_BUFFERING:
@@ -451,23 +472,23 @@ package com.fenhongxiang
 					_isBuffering = true;
 					break;
 				}
-				
+
 				case HLSPlayStates.PAUSED:
 				case HLSPlayStates.PLAYING:
 				{
 					_isBuffering = false;
 					break;
 				}
-					
+
 				default:
 				{
 					break;
 				}
 			}
 		}
-		
+
 		private function stop():void
-		{			
+		{
 			if (ObjectUtil.available(_hls, ['stream']))
 			{
 				_isPlaying = false;
