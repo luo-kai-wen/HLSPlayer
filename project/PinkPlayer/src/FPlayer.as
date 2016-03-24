@@ -28,7 +28,7 @@ package
 	import flash.ui.ContextMenuItem;
 	
 	[SWF(width="720", height="408", frameRate="60")]
-	public class PinkPlayer extends Sprite
+	public class FPlayer extends Sprite
 	{
 		private var adPlayer:ADPlayer;
 		private var autoPlay:Boolean=false;
@@ -43,7 +43,7 @@ package
 		private var srtURL:String;
 		private var thumbURL:String;
 
-		public function PinkPlayer()
+		public function FPlayer()
 		{
 			this.addEventListener(Event.ADDED_TO_STAGE, onPlayerdAddedToStageHandler, false, 0, true);
 		}
@@ -74,7 +74,6 @@ package
 			pauseADImageURL = ObjectUtil.getSWFParameter('pauseADImageURL', this.stage);
 			pauseADClickURL = ObjectUtil.getSWFParameter('pauseADClickURL', this.stage);
 			autoPlay 		= ObjectUtil.parseBoolean(ObjectUtil.getSWFParameter('autoPlay', this.stage));
-			
 			//加载皮肤
 			SkinLoader.getInstance().load(skinURL, skinLoadedHandler);
 		}
