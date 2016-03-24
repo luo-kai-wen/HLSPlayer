@@ -15,7 +15,6 @@
         <link rel="stylesheet" type="text/css" href="history/history.css" />
         <script type="text/javascript" src="history/history.js"></script>
         <!${useBrowserHistory} END Browser History required section -->  
-            
         <script type="text/javascript" src="swfobject.js"></script>
         <script type="text/javascript">
             // For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection. 
@@ -24,15 +23,15 @@
             var xiSwfUrlStr = "${expressInstallSwf}";
             var flashvars = {};
 
-            flashvars.coverURL = "http://localhost:9096/video/sintelCover.jpg";//cover image path 720x408
-            flashvars.hlsURL = "http://localhost:9096/video/sintel-2048-surround_Apple_HLS_h264_LF_16x9_720p/sintel-2048-surround_Apple_HLS_h264_LF_16x9_720p.m3u8";//m3u8 file path
-            flashvars.srtURL = "http://localhost:9096/srt/sintel_zh.srt";//srt file
-            flashvars.thumbURL= "http://localhost:9096/video/sintel-2048-surround.mp4.vtt";//vtt thumbnail
-            flashvars.prerollURL = "http://localhost:9096/vod/Sexy%20Guitar%2001.mp4";//F4V、MP4、M4A、MOV、MP4V、3GP 和 3G2
-            flashvars.prerollClickURL = "https://www.fenhongxiang.com";
-            flashvars.skinURL = "PlayerSkin.swf";
-            flashvars.pauseADImageURL = "";//
-            flashvars.pauseADClickURL = "https://www.fenhongxiang.com";//
+            flashvars.coverURL = encodeURIComponent("http://localhost:9096/video/sintelCover.jpg");//cover image path 720x408
+            flashvars.hlsURL = encodeURIComponent("http://localhost:9096/video/sintel-2048-surround_Apple_HLS_h264_LF_16x9_720p/sintel-2048-surround_Apple_HLS_h264_LF_16x9_720p.m3u8");//m3u8 file path
+            flashvars.srtURL = encodeURIComponent("http://localhost:9096/srt/sintel_zh.srt");//srt file
+            flashvars.thumbURL= encodeURIComponent("http://localhost:9096/video/sintel-2048-surround.mp4.vtt");//vtt thumbnail
+            flashvars.prerollURL = encodeURIComponent("http://localhost:9096/vod/Sexy%20Guitar%2001.mp4");//F4V、MP4、M4A、MOV、MP4V、3GP 和 3G2
+            flashvars.prerollClickURL = encodeURIComponent("https://www.fenhongxiang.com");
+            flashvars.skinURL = encodeURIComponent("playerSkin.swf");
+            flashvars.pauseADImageURL = encodeURIComponent("");//
+            flashvars.pauseADClickURL = encodeURIComponent("https://www.fenhongxiang.com");//
             flashvars.autoPlay = "true";//
 
             var params = {};
@@ -51,7 +50,7 @@
                 swfVersionStr, xiSwfUrlStr, 
                 flashvars, params, attributes);
             // JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
-            swfobject.createCSS("#flashContent", "display:block;text-align:left;");
+            swfobject.createCSS("#flashContent", "display:block;text-align:left;");        
         </script>
     </head>
     <body>
