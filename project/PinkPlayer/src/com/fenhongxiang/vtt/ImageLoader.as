@@ -29,11 +29,11 @@ package com.fenhongxiang.vtt
 
 		public function load(url:String):void
 		{
-			_loader = getLoaderInstance();
+			var ldr:Loader = getLoaderInstance();
 			
 			try
 			{
-				_loader.load(new URLRequest(url));
+				ldr.load(new URLRequest(url));
 			}
 			catch (e:*)
 			{
@@ -44,7 +44,7 @@ package com.fenhongxiang.vtt
 		private function onLoadErrorHandler(e:* = null):void
 		{
 			dispatchEvent(new ImageLoaderEvent(ImageLoaderEvent.ERROR, null, true));
-			removeListeners();
+			dispose();
 		}
 
 		private function onLoadedHandler(e:Event):void
@@ -57,7 +57,8 @@ package com.fenhongxiang.vtt
 				bitMap.bitmapData.dispose();
 
 				dispatchEvent(new ImageLoaderEvent(ImageLoaderEvent.LOADED, imgData, true));
-				removeListeners();
+				
+				dispose();
 			}
 			else
 			{
@@ -88,13 +89,16 @@ package com.fenhongxiang.vtt
 			return _loader;
 		}
 
-		private function removeListeners():void
+		private function dispose():void
 		{
 			if (_loader != null)
 			{
 				_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadedHandler);
 				_loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 				_loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoadErrorHandler);
+				
+				_loader.close();
+				_loader = null;
 			}
 		}
 	}

@@ -1,20 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Copyright © 2015 FenHongXiang                                              */
-/* 深圳粉红象科技有限公司                                                                										  */
-/* www.fenhongxiang.com                                                       */
-/* All rights reserved.                                                       */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
 package com.fenhongxiang.srt
 {
 	import flash.events.Event;
 	public class SRTLoaderEvent extends Event
 	{
-		static public  const ERROR:String = "字幕加载失败";
-		static public  const LOADED:String = "字幕加载完成";
+		public static  const ERROR:String = "字幕加载失败";
+		public static  const LOADED:String = "字幕加载完成";
 		
-		public function SRTLoaderEvent(type:String, data:*, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function SRTLoaderEvent(type:String, data:*, bubbles:Boolean = false, cancelable:Boolean = false)
 		{
 			_data = data;
 			super(type, bubbles, cancelable);

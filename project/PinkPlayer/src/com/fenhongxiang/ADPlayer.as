@@ -8,7 +8,7 @@
 package com.fenhongxiang
 {
 	import com.fenhongxiang.util.HtmlUtil;
-	import flash.display.Sprite;
+	import com.fenhongxiang.view.FSprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.NetStatusEvent;
@@ -19,54 +19,32 @@ package com.fenhongxiang
 	import flash.net.NetStream;
 	import flash.text.TextField;
 	import flash.utils.Timer;
-	
 	/**
 	 * 广告播放器
-	 */	
-	public final class ADPlayer extends Sprite
+	 */
+	public final class ADPlayer extends FSprite
 	{
-		public var onEnd:Function;//广告播放完成时的回调函数 
-		public var onError:Function;//广告播放失败回调函数 
-		public var onPlaying:Function;//广告播放时的回调函数 
-		
-		private var _adConnection:NetConnection;
-		private var _adDuration:int;//广告持续时间
-		private var _adLb:TextField;
-		private var _adStream:NetStream;//F4V、MP4、M4A、MOV、MP4V、3GP 和 3G2
-		private var _adTimer:Timer;
-		private var _jumpURL:String = "";
-		private var _src:String;//广告视频URL地址 
-		private var _vidLength:Number;
-		private var _video:Video;
-		private var _viewDirty:Boolean = false;
-		private var _volume:Number = 0.6;
-		private var _width:Number;
-		private var _height:Number;
-		private var _backgroundColor:uint = 0x000000;
-		
 		
 		public function ADPlayer()
 		{
 			this.addEventListener(Event.ADDED_TO_STAGE, onAddToStageHandler, false, 0, true);
 		}
-		
-		public function set backgroundColor(color:uint):void
-		{
-			_backgroundColor = color;
-		}
-		
-		override public  function get height():Number
-		{
-			return _height;
-		}
-		
-		override public  function set height(value:Number):void
-		{
-			_height = value;
-			_viewDirty = true;
-			invalidateDisplaylist();
-		}
 
+		public var onEnd:Function; //广告播放完成时的回调函数 
+		public var onError:Function; //广告播放失败回调函数 
+		public var onPlaying:Function; //广告播放时的回调函数 
+		
+		private var _adConnection:NetConnection;
+		private var _adDuration:int; //广告持续时间
+		private var _adLb:TextField;
+		private var _adStream:NetStream; //F4V、MP4、M4A、MOV、MP4V、3GP 和 3G2
+		private var _adTimer:Timer;
+		private var _jumpURL:String = "";
+		private var _src:String; //广告视频URL地址 
+		private var _vidLength:Number;
+		private var _video:Video;
+		private var _volume:Number = 0.6;
+		
 		public function set jumpURL(value:String):void
 		{
 			_jumpURL = value;
@@ -83,10 +61,27 @@ package com.fenhongxiang
 		//------------------------------------------------netstream events---------------------------------------------//
 		public function onPlayStatus(info:Object):void
 		{
-			
+		
 		}
 		
-		public function play(url:String=null, duration:int=0):void
+		override public function onRenderHandler(e:Event):void
+		{
+			super.onRenderHandler(e);
+			
+			if (_video)
+			{
+				_video.width = width;
+				_video.height = height;
+			}
+			
+			if (_adLb)
+			{
+				_adLb.x = width - _adLb.width - 30;
+				_adLb.y = 10;
+			}
+		}
+		
+		public function play(url:String = null, duration:int = 0):void
 		{
 			_src = url;
 			_adDuration = duration;
@@ -100,14 +95,6 @@ package com.fenhongxiang
 			_adConnection.connect(null);
 		}
 		
-		public function resize(w:Number, h:Number):void
-		{
-			_viewDirty = true;
-			
-			_width = w;
-			_height = h;
-			invalidateDisplaylist();
-		}
 		
 		public function get volume():Number
 		{
@@ -125,7 +112,7 @@ package com.fenhongxiang
 				vol = 0.0;
 			}
 			
-			_volume = vol ;
+			_volume = vol;
 			
 			if (_adStream != null)
 			{
@@ -133,19 +120,7 @@ package com.fenhongxiang
 			}
 		}
 		
-		override public  function get width():Number
-		{
-			return _width;
-		}
-		
 		//-----------------------------------------------------setters and getters-----------------------------------------------------------------//
-		override public  function set width(value:Number):void
-		{
-			_width = value;
-			_viewDirty = true;
-			invalidateDisplaylist();
-		}
-		
 		protected function dispose():void
 		{
 			if (_adTimer != null)
@@ -168,16 +143,6 @@ package com.fenhongxiang
 			}
 		}
 		
-		
-		protected function invalidateDisplaylist():void
-		{
-			if (this.stage)
-			{
-				this.stage.invalidate();
-			}
-		}
-
-		
 		private function connectionStatusHandler(e:NetStatusEvent):void
 		{
 			if (e.info.code == "NetConnection.Connect.Success")
@@ -198,7 +163,7 @@ package com.fenhongxiang
 				
 				if (_video == null)
 				{
-					_video = new Video(_width, _height);
+					_video = new Video(width, height);
 					_video.x = 0;
 					_video.y = 0;
 					_video.smoothing = true;
@@ -210,7 +175,7 @@ package com.fenhongxiang
 					_adStream.play(_src);
 					this.addChildAt(_video, 0);
 				}
-				catch(e:SecurityError)
+				catch (e:SecurityError)
 				{
 					//trace("Play SecurityError");
 				}
@@ -227,7 +192,7 @@ package com.fenhongxiang
 			if (this.alpha > 0)
 			{
 				this.alpha -= 0.1;
-				this.volume -= _volume/10;
+				this.volume -= _volume / 10;
 			}
 			else
 			{
@@ -243,7 +208,7 @@ package com.fenhongxiang
 		
 		/**
 		 * 链接跳转
-		 */		
+		 */
 		private function onADPLayerClickHandler(e:MouseEvent):void
 		{
 			if (_jumpURL)
@@ -273,7 +238,7 @@ package com.fenhongxiang
 			
 			if (_adLb)
 			{
-				_adLb.htmlText = "<font size='14' color='#FFFFFF'>广告剩余 <font color='#FF0000' size='16'>" + leftCount +"</font> 秒</font>";
+				_adLb.htmlText = "<font size='14' color='#FFFFFF'>广告剩余 <font color='#FF0000' size='16'>" + leftCount + "</font> 秒</font>";
 			}
 			
 			if (onPlaying != null)
@@ -286,11 +251,11 @@ package com.fenhongxiang
 		{
 			this.removeEventListener(Event.ADDED_TO_STAGE, onAddToStageHandler);
 			
-			this.addEventListener(Event.RENDER, onRenderHandler, false, 0, true);
 			this.addEventListener(MouseEvent.CLICK, onADPLayerClickHandler, false, 0, true);
 			
 			this.stage.addEventListener(Event.RESIZE, onSWFResizeHandler, false, 0, true);
-
+			
+			this.resize(this.stage.stageWidth, this.stage.stageHeight);
 			
 			this.useHandCursor = true;
 			this.buttonMode = true;
@@ -310,31 +275,6 @@ package com.fenhongxiang
 			if (this.stage)
 			{
 				resize(this.stage.stageWidth, this.stage.stageHeight);
-			}
-		}
-		
-		private function onRenderHandler(e:Event):void
-		{
-			if (_viewDirty)
-			{
-				this.graphics.clear();
-				this.graphics.beginFill(0, 1);
-				this.graphics.drawRect(0, 0, _width, _height);
-				this.graphics.endFill();
-				
-				if (_video)
-				{
-					_video.width = _width;
-					_video.height = _height;	
-				}
-				
-				if (_adLb)
-				{
-					_adLb.x = _width - _adLb.width - 30;
-					_adLb.y = 10;
-				}
-				
-				_viewDirty = false;
 			}
 		}
 		
@@ -365,30 +305,30 @@ package com.fenhongxiang
 			}
 		}
 		
-		private function  streamStatusHandler(e:NetStatusEvent):void
+		private function streamStatusHandler(e:NetStatusEvent):void
 		{
 			if (e.info.level == "status")
 			{
-				switch(e.info.code)
+				switch (e.info.code)
 				{
-					case "NetStream.Play.Start"://播放已开始
+					case "NetStream.Play.Start": //播放已开始
 					{
 						startAdTimer();
 						break;
 					}
-					case "NetStream.Play.Stop"://播放已结束
+					case "NetStream.Play.Stop": //播放已结束
 					{
 						fadeOut();
 						break;
 					}
-						
+					
 					default:
 					{
 						break;
 					}
 				}
 			}
-			else//由于某种原因，无法播放广告
+			else //由于某种原因，无法播放广告
 			{
 				if (onError != null)
 				{

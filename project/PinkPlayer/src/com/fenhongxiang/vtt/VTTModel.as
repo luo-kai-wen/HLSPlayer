@@ -24,9 +24,9 @@ package com.fenhongxiang.vtt
 			timeRange = time;
 			imageRange = data;
 		}
-
-		private var _imageRect:Rectangle = new Rectangle(0, 0, 0, 0);
+		
 		private var _path:String;
+		private var _imageRect:Rectangle = new Rectangle(0, 0, 0, 0);
 		private var _timeRange:Rectangle = new Rectangle(0, 0, 0, 1);
 
 		public function getImageRange(time:Number):Rectangle

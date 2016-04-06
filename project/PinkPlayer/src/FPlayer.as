@@ -18,8 +18,10 @@ package
 	import com.fenhongxiang.view.ViewController;
 	import com.fenhongxiang.vtt.VTTControler;
 	
+	import flash.display.InteractiveObject;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.display.Stage;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
@@ -52,28 +54,16 @@ package
 		{
 			this.removeEventListener(Event.ADDED_TO_STAGE, onPlayerdAddedToStageHandler);
 
+			//设置舞台缩放模式
 			stage.align 	= StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			//-----------------------------------右键菜单 --------------------------------//
-			var customeMenu:ContextMenu = new ContextMenu();
-			customeMenu.hideBuiltInItems();
+			//初始化右键菜单
+			createMenu(this);
 			
-			var verItem:ContextMenuItem = new ContextMenuItem("www.fenhongxiang.com", false, false);
-			customeMenu.customItems.push(verItem);
-			this.contextMenu = customeMenu;
+			//获取相关参数
+			getParameters(this.stage);
 			
-			//获取参数
-			coverURL 		= ObjectUtil.getSWFParameter("coverURL", this.stage);
-			hlsURL 			= ObjectUtil.getSWFParameter("hlsURL", this.stage);
-			prerollURL  	= ObjectUtil.getSWFParameter('prerollURL', this.stage);
-			prerollClickURL = ObjectUtil.getSWFParameter('prerollClickURL', this.stage);
-			srtURL 			= ObjectUtil.getSWFParameter('srtURL', this.stage);
-			thumbURL 		= ObjectUtil.getSWFParameter('thumbURL', this.stage);
-			skinURL 		= ObjectUtil.getSWFParameter('skinURL', this.stage);
-			pauseADImageURL = ObjectUtil.getSWFParameter('pauseADImageURL', this.stage);
-			pauseADClickURL = ObjectUtil.getSWFParameter('pauseADClickURL', this.stage);
-			autoPlay 		= ObjectUtil.parseBoolean(ObjectUtil.getSWFParameter('autoPlay', this.stage));
 			//加载皮肤
 			SkinLoader.getInstance().load(skinURL, skinLoadedHandler);
 		}
@@ -86,73 +76,105 @@ package
 			}
 			else
 			{
-				this.graphics.clear();
-				this.graphics.beginFill(0x1F272A, 1.0);
-				this.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
-				this.graphics.endFill();
-				
-				var txt:TextField 		= new TextField();
-					txt.width 			= 300;
-					txt.height 			= 30;
-					txt.mouseEnabled 	= false;
-					txt.selectable 		= false;
-					txt.x				= (this.stage.stageWidth - 300) / 2;
-					txt.y				= (this.stage.stageHeight - 30) / 2;
-					txt.textColor 		= 0xFFFFFF;
-					txt.htmlText		= "<p align='center'>播放器皮肤加载失败.</p>";
-				
-				this.addChild(txt);
+				showErrorMessage("播放器皮肤加载失败.");
 			}
 		}
 		
 		private function initPlayer(skin:MovieClip):void
 		{
 			hlsPlayer = new HLSPlayer();
-			var viewController:ViewController = new ViewController(hlsPlayer, skin);
-			viewController.srtController = new SRTController(srtURL);
-			viewController.vttController = new VTTControler(thumbURL);
-			viewController.coverPath = coverURL;
-			viewController.pauseADImagePath = pauseADImageURL;
-			viewController.pauseADClickURL = pauseADClickURL
-			viewController.stage = this.stage;
+			
+			var viewController:ViewController 	= new ViewController(hlsPlayer, skin);
+			
+			viewController.srtController  		 = new SRTController(srtURL);
+			viewController.vttController  		 = new VTTControler(thumbURL);
+			viewController.coverPath 	  		 = coverURL;
+			viewController.pauseADImagePath 	 = pauseADImageURL;
+			viewController.pauseADClickURL  	 = pauseADClickURL
+			viewController.stage 				 = this.stage;
 			viewController.onCoverButtonCallback = initADPlayer;
 			
 			HLSSettings.logDebug = false;
-			HLSSettings.logInfo = false;
+			HLSSettings.logInfo  = false;
 			HLSSettings.seekMode = HLSSeekMode.KEYFRAME_SEEK;
 			
 			this.addChild(skin);
 		}
-
+		
 		private function initADPlayer():void
 		{
-			adPlayer			=	new ADPlayer();
+			adPlayer			= new ADPlayer();
 			adPlayer.volume 	= 0.3;
 			adPlayer.onEnd 		= onADEnd;
 			adPlayer.onError 	= onADEnd;
 			adPlayer.jumpURL 	= prerollClickURL;
-			adPlayer.resize(this.stage.stageWidth, this.stage.stageHeight);
-			adPlayer.play(prerollURL, 0);
-
+			adPlayer.play(prerollURL, 3);
+			
 			this.addChild(adPlayer);
 		}
-
+		
 		private function onADEnd():void
 		{
 			adPlayer.onEnd	 = null;
 			adPlayer.onError = null
-
-			if (this.contains(adPlayer))
+			
+			if (adPlayer.parent != null)
 			{
-				this.removeChild(adPlayer);
+				adPlayer.parent.removeChild(adPlayer);
 			}
 			
 			adPlayer = null;
-
+			
 			hlsPlayer.autoPlay 	= autoPlay;
 			hlsPlayer.preload 	= true;
 			hlsPlayer.url 		= hlsURL;
 		}
+		
+		//-------------------------------------------------------工具方法------------------------------------------------//
+		private function createMenu(target:InteractiveObject):void
+		{
+			var verItem:ContextMenuItem = new ContextMenuItem("www.fenhongxiang.com", false, false);
 
+			var customeMenu:ContextMenu = new ContextMenu();
+				customeMenu.hideBuiltInItems();
+				customeMenu.customItems.push(verItem);
+				
+			target.contextMenu = customeMenu;
+		}
+		
+		private function getParameters(target:Stage):void
+		{
+			//获取参数
+			coverURL 		= ObjectUtil.getSWFParameter("coverURL", target);
+			hlsURL 			= ObjectUtil.getSWFParameter("hlsURL", target);
+			prerollURL  	= ObjectUtil.getSWFParameter('prerollURL', target);
+			prerollClickURL = ObjectUtil.getSWFParameter('prerollClickURL', target);//跳转地址需要对地址合法性进行验证，防止跨域攻击
+			srtURL 			= ObjectUtil.getSWFParameter('srtURL', target);
+			thumbURL 		= ObjectUtil.getSWFParameter('thumbURL', target);
+			skinURL 		= ObjectUtil.getSWFParameter('skinURL', target);
+			pauseADImageURL = ObjectUtil.getSWFParameter('pauseADImageURL', target);
+			pauseADClickURL = ObjectUtil.getSWFParameter('pauseADClickURL', target);//跳转地址需要对地址合法性进行验证，防止跨域攻击
+			autoPlay 		= ObjectUtil.parseBoolean(ObjectUtil.getSWFParameter('autoPlay', target));
+		}
+		
+		private function showErrorMessage(msg:String):void
+		{
+			this.graphics.clear();
+			this.graphics.beginFill(0x1F272A, 1.0);
+			this.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+			this.graphics.endFill();
+			
+			var txt:TextField 		= new TextField();
+				txt.width 			= 300;
+				txt.height 			= 30;
+				txt.mouseEnabled 	= false;
+				txt.selectable 		= false;
+				txt.x				= (this.stage.stageWidth - 300) / 2;
+				txt.y				= (this.stage.stageHeight - 30) / 2;
+				txt.textColor 		= 0xFFFFFF;
+				txt.htmlText		= "<p align='center'>"+msg+"</p>";
+			
+			this.addChild(txt);
+		}
 	}
 }

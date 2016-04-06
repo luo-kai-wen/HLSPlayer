@@ -125,7 +125,7 @@ package com.fenhongxiang.util
 
 		private function dispose():void
 		{
-			if (_loader)
+			if (_loader != null)
 			{
 				_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadedHandler);
 				_loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);

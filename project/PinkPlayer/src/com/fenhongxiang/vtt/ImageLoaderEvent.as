@@ -10,6 +10,7 @@ package com.fenhongxiang.vtt
 {
 	import flash.display.BitmapData;
 	import flash.events.Event;
+	
 	public class ImageLoaderEvent extends Event
 	{
 		public static const ERROR:String = "图像加载失败";

@@ -9,6 +9,9 @@
 package com.fenhongxiang.view
 {
 	import com.fenhongxiang.HLSPlayer;
+	import com.fenhongxiang.cue.CueContainer;
+	import com.fenhongxiang.cue.CueData;
+	import com.fenhongxiang.cue.CueUtil;
 	import com.fenhongxiang.srt.SRTController;
 	import com.fenhongxiang.util.HtmlUtil;
 	import com.fenhongxiang.util.SkinLoader;
@@ -52,30 +55,22 @@ package com.fenhongxiang.view
 		}
 
 		private var _coverPath:String;
-
 		private var _onCoverButtonCallback:Function;
 		private var _pauseADClickURL:String;
 		private var _pauseADImagePath:String;
-
 		private var _player:HLSPlayer;
 		private var _skin:MovieClip;
-
 		private var _srtController:SRTController;
 		private var _stage:Stage;
 		private var _timer:Timer = new Timer(450);
-
 		private var _viewLocked:Boolean = false;
-
 		private var _vttController:VTTControler;
 		private var bigPlayButton:SimpleButton;
 		private var controlBar:Sprite;
 		private var coverContainer:Sprite;
 		private var fullscreenButtonGroup:Sprite;
-
 		private var isFullScreen:Boolean = false;
 		private var miniProgressBar:MovieClip;
-
-
 		private var pauseADContainer:Sprite;
 		private var playerContainer:Sprite;
 		private var progressBar:Sprite;
@@ -83,13 +78,12 @@ package com.fenhongxiang.view
 		private var settingButton:SimpleButton;
 		private var settingPanel:Sprite;
 		private var srtTextField:TextField;
-
 		private var thumbImg:Bitmap;
 		private var timeClip:Sprite;
 		private var toogleButton:MovieClip;
-
 		private var tweenID:int = -1;
 		private var volumeBar:MovieClip;
+		private var cuePointsContainer:CueContainer;
 
 		public function set coverPath(value:String):void
 		{
@@ -178,41 +172,88 @@ package com.fenhongxiang.view
 			});
 
 			pauseADContainer = SkinLoader.getInstance().getSkinPart("pauseADContainer");
-			pauseADContainer.visible = false;
+			
+			if (pauseADContainer != null)
+			{
+				pauseADContainer.visible = false;
+			}
 
 			settingButton = SkinLoader.getInstance().getSkinPart("controlBar", 'settingButton'); //设置按钮
-			settingButton.cacheAsBitmap = true;
-			settingButton.addEventListener(MouseEvent.CLICK, onSettinButtonClickHandler, false, 0, true);
+			
+			if (settingButton != null)
+			{
+				settingButton.cacheAsBitmap = true;
+				settingButton.addEventListener(MouseEvent.CLICK, onSettinButtonClickHandler, false, 0, true);
+			}
+
 
 			bigPlayButton = SkinLoader.getInstance().getSkinPart("bigPlayButton"); //大播放按钮
-			bigPlayButton.cacheAsBitmap = true;
-			bigPlayButton.addEventListener(MouseEvent.CLICK, onBigPlayButtonClickHandler, false, 0, true);
+			
+			if (bigPlayButton != null)
+			{
+				bigPlayButton.cacheAsBitmap = true;
+				bigPlayButton.addEventListener(MouseEvent.CLICK, onBigPlayButtonClickHandler, false, 0, true);
+			}
+
 
 			settingPanel = SkinLoader.getInstance().getSkinPart("settingPanel"); //设置按钮
-			settingPanel.cacheAsBitmap = true;
+			
+			if (settingPanel != null)
+			{
+				settingPanel.cacheAsBitmap = true;
+			}
 
 			volumeBar = SkinLoader.getInstance().getSkinPart("controlBar", 'volumeBar'); //音量按钮
-			volumeBar.addEventListener(MouseEvent.CLICK, onVolumeBarClickHandler, false, 0, true);
+			
+			if (volumeBar != null)
+			{
+				volumeBar.addEventListener(MouseEvent.CLICK, onVolumeBarClickHandler, false, 0, true);
+			}
 
 			toogleButton = SkinLoader.getInstance().getSkinPart("controlBar", 'toogleButton'); //暂停播放
-			toogleButton.addEventListener(MouseEvent.CLICK, onToogleButtonClickHandler, false, 0, true);
+			
+			if (toogleButton != null)
+			{
+				toogleButton.addEventListener(MouseEvent.CLICK, onToogleButtonClickHandler, false, 0, true);
+			}
 
 			replayButton = SkinLoader.getInstance().getSkinPart("controlBar", 'replayButton'); //重播
-			replayButton.addEventListener(MouseEvent.CLICK, onReplayButtonClickHandler, false, 0, true);
+			
+			if (replayButton != null)
+			{
+				replayButton.addEventListener(MouseEvent.CLICK, onReplayButtonClickHandler, false, 0, true);
+			}
 
 			progressBar = SkinLoader.getInstance().getSkinPart("controlBar", 'progressBar'); //进度条
-			progressBar.addEventListener(MouseEvent.CLICK, onProgressBarClickHandler, false, 0, true);
-			progressBar.addEventListener(MouseEvent.MOUSE_MOVE, onProgressBarMoveHandler);
+			
+			if (progressBar != null)
+			{
+				cuePointsContainer = new CueContainer();
+				cuePointsContainer.resize(progressBar.width, progressBar.height);
+				cuePointsContainer.data = CueUtil.jsonToVector(CueUtil.testJson);;
+				cuePointsContainer.y = 0;
+				
+				progressBar.addChildAt(cuePointsContainer, progressBar.numChildren);
+				
+				
+				progressBar.addEventListener(MouseEvent.CLICK, onProgressBarClickHandler, false, 0, true);
+				progressBar.addEventListener(MouseEvent.MOUSE_MOVE, onProgressBarMoveHandler);
+			}
 
 			fullscreenButtonGroup = SkinLoader.getInstance().getSkinPart("controlBar", 'fullscreenButtonGroup'); //全屏按钮组
-			fullscreenButtonGroup.addEventListener(MouseEvent.CLICK, toggleFullScreen, false, 0, true);
+			
+			if (fullscreenButtonGroup)
+			{
+				fullscreenButtonGroup.addEventListener(MouseEvent.CLICK, toggleFullScreen, false, 0, true);
+			}
 
 			miniProgressBar = SkinLoader.getInstance().getSkinPart("miniProgressBar"); //迷你进度条
 
 			timeClip = SkinLoader.getInstance().getSkinPart("controlBar", 'timeClip'); //时间显示
 
 			var thumbContainer:MovieClip = SkinLoader.getInstance().getSkinPart("controlBar", 'thumbContainer');
-			if (thumbContainer)
+			
+			if (thumbContainer != null)
 			{
 				thumbContainer.mouseChildren = false;
 				thumbContainer.mouseEnabled = false;
@@ -233,7 +274,7 @@ package com.fenhongxiang.view
 				playerContainer.addEventListener(MouseEvent.DOUBLE_CLICK, onStageDoubleClickHandler, false, 0, true);
 			}
 
-			if (_player)
+			if (_player != null)
 			{
 				playerContainer.addChild(_player);
 				_timer.addEventListener(TimerEvent.TIMER, updateView);
@@ -242,7 +283,7 @@ package com.fenhongxiang.view
 				_player.volume = volumeBar.getVolume();
 			}
 
-			if (_stage)
+			if (_stage != null)
 			{
 				resizeSkin(_stage.stageWidth, _stage.stageHeight, false);
 			}
@@ -332,11 +373,24 @@ package com.fenhongxiang.view
 				var timePos:Number = e.currentTarget.mouseX / progressBar.width * _player.duration;
 
 				if (_vttController)
+				{
 					_vttController.renderImage(timePos, thumbImg.bitmapData);
-
+				}
+				
 				if (timeClip)
 				{
 					timeClip['timeLb']['text'] = TimeUtil.getTimeString(timePos);
+				}
+				
+				
+				if (cuePointsContainer != null)
+				{
+					thumbImg.visible = !cuePointsContainer.tipVisible;
+					
+					if (timeClip != null)
+					{
+						timeClip.visible = !cuePointsContainer.tipVisible;
+					}
 				}
 			}
 		}
@@ -391,32 +445,36 @@ package com.fenhongxiang.view
 		private function onStageKeyDownHandler(e:KeyboardEvent):void
 		{
 			if (_player == null)
+			{
 				return;
-
-			if (e.keyCode == 39) //右箭头
+			}
+			else
 			{
-				_player.step(stepGap);
-			}
-			else if (e.keyCode == 37) //左箭头
-			{
-				_player.step(-stepGap);
-			}
-			else if (e.keyCode == 38) //上箭头
-			{
-				var upVol:Number = volumeBar.getVolume() + 0.1;
-				_player.volume = upVol;
-				updateVolumeView(upVol)
-			}
-			else if (e.keyCode == 40)
-			{ // 下箭头
-				var downVol:Number = volumeBar.getVolume() - 0.1;
-
-				_player.volume = downVol;
-				updateVolumeView(downVol)
-			}
-			else if (e.keyCode == 32)
-			{ //  空格键: 暂停切换
-				_player.togglePause();
+				if (e.keyCode == 39)//右箭头
+				{
+					_player.step(stepGap);
+				}
+				else if (e.keyCode == 37)//左箭头
+				{
+					_player.step(-stepGap);
+				}
+				else if (e.keyCode == 38)//上箭头
+				{
+					var upVol:Number = volumeBar.getVolume() + 0.1;
+					_player.volume = upVol;
+					updateVolumeView(upVol)
+				}
+				else if (e.keyCode == 40)//下箭头
+				{ 
+					var downVol:Number = volumeBar.getVolume() - 0.1;
+					
+					_player.volume = downVol;
+					updateVolumeView(downVol)
+				}
+				else if (e.keyCode == 32)//空格键: 暂停切换
+				{ 
+					_player.togglePause();
+				}
 			}
 		}
 
@@ -581,7 +639,7 @@ package com.fenhongxiang.view
 				miniProgressBar.y = newHeight - miniProgressBar.height;
 				miniProgressBar.x = 0;
 
-				for (var j:int = 0; j < progressBar.numChildren; j++)
+				for (var j:int = 0; j < miniProgressBar.numChildren; j++)
 				{
 					miniProgressBar.getChildAt(j).width = newWidth;
 				}

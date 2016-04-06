@@ -1,55 +1,64 @@
+//------------------------------------------------------------------------------
+//
+//   Copyright 2016 www.fenhongxiang.com 
+//   All rights reserved. 
+//   By :ljh 
+//
+//------------------------------------------------------------------------------
+
 package com.fenhongxiang.util
 {
 	import flash.display.Stage;
-
 	public final class ObjectUtil
 	{
-		public function ObjectUtil()
-		{
-		}
 		
-		public static function available(obj:Object, ...args):Boolean
+		public static function available(obj:Object, ... args):Boolean
 		{
-			if(obj == null) return false;
-			
-			for each(var prop:* in args)
+			if (obj == null)
 			{
-				if (!obj.hasOwnProperty(prop) || obj[prop] == null )
-				{
-					return false;
-					break;
-				}
-			}
-			
-			return true;
-		}
-		
-		public static function parseBoolean(value:*):Boolean
-		{
-			var result:Boolean=false;
-			
-			if (value is String)
-			{
-				result=(value == "true") ? true : false;
+				return false;
 			}
 			else
 			{
-				result=Boolean(value);
+				for each (var prop:* in args)
+				{
+					if (!obj.hasOwnProperty(prop) || obj[prop] == null)
+					{
+						return false;
+						break;
+					}
+				}
+				
+				return true;
 			}
-			
-			return result;
 		}
 		
 		public static function getSWFParameter(name:String, stage:Stage):String
 		{
-			var paramValue:* = "";
-			
-			if (stage && name)
+			if (stage != null && name)
 			{
-				paramValue = stage.loaderInfo.parameters[name];
+				return stage.loaderInfo.parameters[name];
 			}
-			
-			return paramValue;
+			else
+			{
+				return "";
+			}
+		}
+		
+		public static function parseBoolean(value:*):Boolean
+		{
+			if (value is String)
+			{
+				return (value == "true") ? true : false;
+			}
+			else
+			{
+				return Boolean(value);
+			}
+		}
+
+		public function ObjectUtil()
+		{
 		}
 	}
 }
