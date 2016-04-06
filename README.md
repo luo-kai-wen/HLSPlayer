@@ -39,10 +39,13 @@
 
 
 
-5.视频显示时间点功能
+5.视频打点显示。目前是解析传过来的JSON打点信息，然后在进度条上生成对应显示点。
 
 
 ![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot08.png?raw=true)
+
+
+
 待完成功能：
 
 
