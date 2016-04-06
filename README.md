@@ -38,6 +38,11 @@
 ![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot04.png?raw=true)
 
 
+
+5.视频显示时间点功能
+
+
+![image](https://github.com/luojianghong/HLSPlayer/blob/master/shots/shot08.png?raw=true)
 待完成功能：
 
 
