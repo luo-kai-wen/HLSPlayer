@@ -5,6 +5,9 @@
 注意：播放器皮肤源文件位于工程的lib目录中
 
 
+在线预览地址：http://www.fenhongxiang.com/video/FPlayer.html
+
+
 1.播放器支持COVER
 
 
