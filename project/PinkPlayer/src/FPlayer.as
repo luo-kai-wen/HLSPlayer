@@ -29,7 +29,7 @@ package
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
 	
-	[SWF(width="720", height="408", frameRate="60")]
+	[SWF(width="720", height="408", frameRate="24")]
 	public class FPlayer extends Sprite
 	{
 		private var adPlayer:ADPlayer;
@@ -108,7 +108,7 @@ package
 			adPlayer.onEnd 		= onADEnd;
 			adPlayer.onError 	= onADEnd;
 			adPlayer.jumpURL 	= prerollClickURL;
-			adPlayer.play(prerollURL, 3);
+			adPlayer.play(prerollURL, 0);
 			
 			this.addChild(adPlayer);
 		}
