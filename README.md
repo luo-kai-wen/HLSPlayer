@@ -8,6 +8,9 @@
 在线预览地址：http://www.fenhongxiang.com/video/vod/FPlayer.html
 
 
+2016-04-29 更新字幕，皮肤。
+
+
 1.播放器支持COVER
 
 
