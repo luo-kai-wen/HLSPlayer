@@ -10,6 +10,7 @@ package com.fenhongxiang.view
 {
 	import com.fenhongxiang.cue.CueData;
 	import com.fenhongxiang.event.FResizeEvent;
+	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	public class FSprite extends Sprite
@@ -29,6 +30,11 @@ package com.fenhongxiang.view
 		private var _viewDirty:Boolean = false;
 		private var _width:Number = 300;
 		
+		public function get backgroundAlpha():Number
+		{
+			return _backgroundAlpha;
+		}
+
 		public function get backgroudColor():uint
 		{
 			return _backgroudColor;
@@ -53,6 +59,8 @@ package com.fenhongxiang.view
 				invalidateDisplaylist();
 			}
 		}
+		
+		
 		
 		public function get border():Boolean
 		{
