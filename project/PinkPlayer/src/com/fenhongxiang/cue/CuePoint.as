@@ -21,7 +21,7 @@ package com.fenhongxiang.cue
 			this.useHandCursor = true;
 			
 			border = false;
-			backgroudColor = 0xA6A6A6;
+			backgroudColor = 0xffb81d;
 			resize(3, 10);
 			addEventListeners();
 		}
@@ -77,7 +77,7 @@ package com.fenhongxiang.cue
 		
 		private function hideTip(e:MouseEvent):void
 		{
-			backgroudColor = 0xA6A6A6;
+			backgroudColor = 0xffb81d;
 			
 			if(_toogleTip != null)
 			{
@@ -87,7 +87,7 @@ package com.fenhongxiang.cue
 		
 		private function showTip(e:MouseEvent):void
 		{
-			backgroudColor = 0xFF0000;
+			backgroudColor = 0xffaf00;
 			
 			if(_toogleTip != null)
 			{
